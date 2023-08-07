@@ -14,14 +14,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-app.get("/", (req, res) => {
-  console.log("From Express");
+app.get("/", (req, res, next) => {
   res.status(200);
   res.json({ message: "Hello" });
+  //Async Error handler
+  // setTimeout(() => {
+  //   next(new Error("hello"));
+  // }, 1);
 });
 
 app.use("/api", protect, router);
 app.post("/user", createUser);
 app.post("/signin", signin);
+
+app.use((err, req, res, next) => {
+  if (err.type === "input") {
+    res.status(400).json({ message: "inavalid input" });
+  } else {
+    res.status(500).json({ message: "oops,something went wrong!" });
+  }
+});
 
 export default app;
